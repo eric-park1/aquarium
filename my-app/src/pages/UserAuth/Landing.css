@@ -1,0 +1,17 @@
+.page-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+    width: 100vw; /* Full width of the viewport */
+}
+  
+.left-side {
+    flex: 1; /* Take up half the available width */
+    /* overflow-y: auto;  */
+    /* work on getting rid of the white background in the scrollable edges */
+    background-color: #1F1746; /* Optional background color */
+}
+  
+.right-side {
+    flex: 1; /* Also takes half the available width */
+    background-color: #ffffff; /* Optional background color */
+}

@@ -1,0 +1,90 @@
+/* Root element styling */
+#root {
+  /* Removed max-width and auto margin for full-width layout */
+  /* padding: 2rem; */
+  text-align: center;
+}
+
+/* Logo styling */
+.logo {
+  height: 6em;
+  /* padding: 1.5em; */
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* Card component styling */
+/* .card {
+  padding: 2em;
+} */
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Split-screen container styling */
+.page-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.left-side {
+  flex: 1;
+  background-color: #1F1746;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  /* padding: 20px; */
+}
+
+.left-side h1 {
+  font-size: 36px;
+  color: #ffffff;
+}
+
+.left-side p {
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+}
+
+.right-side {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+/* Login/signup container styling */
+.container {
+  background: #fff;
+  /* padding: 30px; */
+  width: 100%;
+  /* max-width: 400px; */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}

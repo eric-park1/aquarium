@@ -1,31 +1,37 @@
-// server/server.js
+// Import dependencies
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/authRoutes');
+const { requireAuth, checkUser } = require('./middleware/authMiddleware');
+const path = require('path');
 
+// Initialize environment variables
+dotenv.config();
+
+// Create Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-const authRoutes = require("./authRoutes");
-app.use("/api/auth", authRoutes);
+const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(express.static('public')); // Serve static files
+app.use(express.json());           // Parse JSON bodies
+app.use(cookieParser());           // Parse cookies
 
-// MongoDB Connection
+// Set up EJS view engine and view directory
+app.set('view engine', 'ejs');
+
+// MongoDB connection
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
 mongoose.connect(process.env.MONGO_URI, clientOptions)
     .then(() => console.log("Successfully connected to MongoDB"))
     .catch(error => console.error("MongoDB connection error:", error));
 
-// Basic route
-app.get('/', (req, res) => {
-  res.send('Hello from the server!');
-});
+// Routes
+app.get('*', checkUser); // Run checkUser middleware on all routes to check user authentication status
+app.get('/', requireAuth, (req, res) => res.render('home')); // Protected home route
+app.use("/api/auth", authRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Start the server
+app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));

@@ -1,0 +1,100 @@
+.log-sign-container{
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 200px;
+    background: #fff;
+    padding-bottom: 30px;
+}
+
+.log-sign-header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.log-sign-text{
+    color: #1F1746;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.log-sign-underline{
+    width: 20px;
+    height: 3px;
+    background: #1F1746;
+    border-radius: 9px;
+}
+
+.log-sign-inputs{
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input{
+    display: flex;
+    align-items: center;
+    margin: auto;
+    width: 240px;
+    height: 40px;
+    background: #eaeaea;
+    border-radius: 3px;
+}
+
+.input img{
+    width: 15px; /* Adjust width as needed */
+    height: 15px; /* Adjust height as needed */
+    margin: 0px 15px;
+}
+
+.input input{
+    height: 25px;
+    width: 200px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #797979;
+    font-size: 12px;
+}
+
+.forgot-password{
+    padding-left: 0px;
+    margin-top: 14px;
+    color: #797979;
+    font-size: 10px;
+}
+
+.forgot-password span{
+    color: #1F1746;
+    cursor: pointer;
+}
+
+.submit-container{
+    display: flex;
+    gap: 15px;
+    margin: 30px auto;
+}
+
+.submit{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 110px;
+    height: 30px;
+    color: #fff;
+    background: #1F1746;
+    border-radius: 25px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.gray{
+    background: #eaeaea;
+    color: #676767;
+}
