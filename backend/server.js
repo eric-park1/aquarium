@@ -12,7 +12,7 @@ dotenv.config();
 
 // Create Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // Middleware
 app.use(express.static('public')); // Serve static files
@@ -30,8 +30,10 @@ mongoose.connect(process.env.MONGO_URI, clientOptions)
 
 // Routes
 app.get('*', checkUser); // Run checkUser middleware on all routes to check user authentication status
-app.get('/', requireAuth, (req, res) => res.render('home')); // Protected home route
-app.use("/api/auth", authRoutes);
+//app.get('/', requireAuth, (req, res) => res.render('home')); // Protected home route
+//app.get('/home', requireAuth, (req, res) => res.render('home'));
+app.use("/", authRoutes);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
+

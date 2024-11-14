@@ -88,3 +88,4 @@ const handleErrors = (err) => {
     res.cookie('jwt', '', { maxAge: 1 });
     res.redirect('/');
   }
+

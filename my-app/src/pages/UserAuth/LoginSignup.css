@@ -29,6 +29,18 @@
     border-radius: 9px;
 }
 
+.create-account{
+    padding-left: 0px;
+    margin-top: 14px;
+    color: #797979;
+    font-size: 10px;
+}
+
+.create-account span{
+    color: #1F1746;
+    cursor: pointer;
+}
+
 .log-sign-inputs{
     margin-top: 15px;
     display: flex;
@@ -62,6 +74,20 @@
     font-size: 12px;
 }
 
+.submit-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 110px;
+    height: 30px;
+    color: #fff;
+    background: #1F1746;
+    border-radius: 25px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .forgot-password{
     padding-left: 0px;
     margin-top: 14px;
@@ -80,7 +106,7 @@
     margin: 30px auto;
 }
 
-.submit{
+/* .submit{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -97,4 +123,4 @@
 .gray{
     background: #eaeaea;
     color: #676767;
-}
+} */
