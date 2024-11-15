@@ -30,40 +30,22 @@ const LoginSignup = () => {
     }
   };
 
-  // const handleSignup = async (e) => {
-  //   e.preventDefault(); // Prevent form from refreshing the page
-  //   try {
-  //     const response = await API.post("/auth/signup", { email, password });
-  //     //navigate('/home', { replace: true });
-  //     window.location.href = '/home';
-  //     alert(response.data.message);
-  //   } catch (error) {
-  //     setError(error.response?.data?.error || "An unknown error occurred.");
-  //   }
-  // };
-
   const handleSignup = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form from refreshing the page
     try {
-      const response = await fetch('http://localhost:3000/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('jwt', data.token); // Store JWT token in localStorage
-        navigate('/home'); // Redirect to home page after successful signup
-      } else {
-        setError(data.error); // Display error message
+      const response = await API.post("/api/authRoutes/signup", { email, password });
+      if (response.status === 201 && response.data.user) {
+        setSuccess(true); // Update state to show success
+        console.log('Signup successful:', response.data); // Log the response
+        navigate('/home', { replace: true });
       }
     } catch (error) {
-      console.log(error);
-      setError('An error occurred');
+      if (err.response && err.response.data.errors) {
+        setError(err.response.data.errors); // Display specific error from backend
+      } else {
+        setError('An error occurred. Please try again.'); // Generic error message
+      }
+      console.error('Signup error:', err);
     }
   };
 
