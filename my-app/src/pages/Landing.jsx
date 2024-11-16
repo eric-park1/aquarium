@@ -3,7 +3,7 @@ import React from "react";
 // import Signup from "../screens/UserAuth/Signup";
 // import Login from "../screens/UserAuth/Login";
 import "./Landing.css";
-import LoginSignup from "./LoginSignup";
+import LoginSignup from "./UserAuth/LoginSignup"
 
 const Landing = () => {
     return (

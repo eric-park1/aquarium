@@ -1,51 +1,48 @@
 import React, { useState } from "react";
-import "./LoginSignup.css";
-import API from "../../services/api";
+import { useLogin } from "../../hooks/useLogin";
+import { useSignup } from "../../hooks/useSignup";
 import { useNavigate } from "react-router-dom";
+import "./LoginSignup.css";
 
 import user_icon from "../../assets/user-account.png";
 import user_email from "../../assets/mail.png";
 import user_password from "../../assets/padlock.png";
-
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Login");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // To display error messages
+  const { login, isLoading: isLoginLoading } = useLogin();
+  const { signup, isLoading: isSignupLoading } = useSignup();
   const navigate = useNavigate();
 
-
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent form from refreshing the page
+    e.preventDefault();
+    setError("");
+
     try {
-      const response = await API.post("/auth/login", { username, password });
-      document.cookie = `jwt=${response.data.token}; path=/; Secure; HttpOnly`;
-      //localStorage.setItem("token", response.data.token);
-      navigate('/home', { replace: true });
-      alert("Login successful!");
-    } catch (error) {
-      setError(error.response?.data?.error || "An unknown error occurred.");
+      const success = await login(email, password);
+      if (success) {
+        navigate("/"); // Redirect to home page after successful login
+      }
+    } catch (err) {
+      setError("Login failed. Please check your credentials.");
     }
   };
 
   const handleSignup = async (e) => {
-    e.preventDefault(); // Prevent form from refreshing the page
+    e.preventDefault();
+    setError("");
+
     try {
-      const response = await API.post("/api/authRoutes/signup", { email, password });
-      if (response.status === 201 && response.data.user) {
-        setSuccess(true); // Update state to show success
-        console.log('Signup successful:', response.data); // Log the response
-        navigate('/home', { replace: true });
+      const success = await signup(email, password);
+      if (success) {
+        navigate("/"); // Redirect to home page after successful signup
       }
-    } catch (error) {
-      if (err.response && err.response.data.errors) {
-        setError(err.response.data.errors); // Display specific error from backend
-      } else {
-        setError('An error occurred. Please try again.'); // Generic error message
-      }
-      console.error('Signup error:', err);
+    } catch (err) {
+      setError("Signup failed. Please try again.");
     }
   };
 
@@ -56,21 +53,24 @@ const LoginSignup = () => {
         <div className="log-sign-underline"></div>
       </div>
 
-      {/* Link to switch to Sign Up */}
-      <div className="create-account"> 
+      <div className="create-account">
         {action === "Login" ? (
           <>
-            Don't have an account? <span onClick={() => setAction("Sign Up")}>Create an account</span>
+            Don't have an account?{" "}
+            <span onClick={() => setAction("Sign Up")}>Create an account</span>
           </>
         ) : (
           <>
-            Already have an account? <span onClick={() => setAction("Login")}>Log In</span>
+            Already have an account?{" "}
+            <span onClick={() => setAction("Login")}>Log In</span>
           </>
         )}
       </div>
 
-      {/* Form */}
-      <form onSubmit={action === "Login" ? handleLogin : handleSignup} className="log-sign-inputs">
+      <form
+        onSubmit={action === "Login" ? handleLogin : handleSignup}
+        className="log-sign-inputs"
+      >
         {action === "Sign Up" && (
           <div className="input">
             <img src={user_icon} alt="" />
@@ -101,14 +101,17 @@ const LoginSignup = () => {
           />
         </div>
 
-        {error && <div className="error-message">{error}</div>} {/* Display error message */}
+        {error && <div className="error-message">{error}</div>}
 
-        <button type="submit" className="submit-button">
+        <button
+          type="submit"
+          className="submit-button"
+          disabled={action === "Login" ? isLoginLoading : isSignupLoading}
+        >
           {action === "Login" ? "Login" : "Sign Up"}
         </button>
       </form>
 
-      {/* Conditional display for Forgot Password link */}
       {action === "Login" && (
         <div className="forgot-password">
           Forgot your password? <span>Click Here</span>
@@ -119,4 +122,3 @@ const LoginSignup = () => {
 };
 
 export default LoginSignup;
-

@@ -1,6 +1,6 @@
 
 import { useState } from "react"
-import { useSignup } from "../hooks/useSignup"
+import { useSignup } from "../../hooks/useSignup"
 import { useNavigate } from 'react-router-dom';
 //const navigate = useNavigate()
 

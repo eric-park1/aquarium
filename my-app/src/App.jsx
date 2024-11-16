@@ -6,8 +6,8 @@ import "./styles/App.css"
 // pages & components
 import Land from './pages/ThreeScene'
 import Landing from './pages/Landing'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
+import Login from './pages/UserAuth/Login'
+import Signup from './pages/UserAuth/Signup'
 import Navbar from './components/Navbasr'
 
 function App() {
@@ -27,10 +27,10 @@ function App() {
               path="/login" 
               element={!user ? <Landing /> : <Navigate to="/" />} 
             />
-            <Route 
+            {/* <Route 
               path="/signup" 
               element={!user ? <Signup /> : <Navigate to="/" />} 
-            />
+            /> */}
           </Routes>
         </div>
       </BrowserRouter>
