@@ -4,11 +4,11 @@ import "./styles/App.css"
 
 
 // pages & components
-import Land from './pages/ThreeScene'
+import Home from './pages/Home'
 import Landing from './pages/Landing'
 import Login from './pages/UserAuth/Login'
 import Signup from './pages/UserAuth/Signup'
-import Navbar from './components/Navbasr'
+import ThreeScene from './pages/ThreeScene'
 
 function App() {
   const { user } = useAuthContext()
@@ -17,16 +17,45 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <div className="pages">
-        <Navbar />
+        {/* <Navbar /> */}
           <Routes>
             <Route 
               path="/" 
-              element={user ? <Land /> : <Navigate to="/login" />} 
+              element={user ? <Home /> : <Navigate to="/login" />} 
             />
             <Route 
               path="/login" 
               element={!user ? <Landing /> : <Navigate to="/" />} 
             />
+            <Route 
+              path="/about" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/leadership" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/tanks" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/shop" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/history" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/calendar" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/task" 
+              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+            />
+
             {/* <Route 
               path="/signup" 
               element={!user ? <Signup /> : <Navigate to="/" />} 
