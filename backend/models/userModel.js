@@ -49,7 +49,7 @@ const userSchema = new Schema({
   aquarium: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'MarineOrganism', // Reference to the marine schema
+      ref: 'tank', // Reference to the tank schema
     },
   ],
   achievements: [
@@ -113,25 +113,6 @@ userSchema.statics.login = async function(email, password) {
     throw new Error('Incorrect password');
   }
 
-  return user;
-}
-
-async function logFocusTime(userId, durationInMinutes) {
-  const user = await User.findById(userId);
-  if (!user) throw new Error('User not found');
-
-  const now = new Date();
-
-  // Add time to the total
-  user.focusTime.total += durationInMinutes;
-
-  // Update time for the relevant periods
-  user.focusTime.pastDay += durationInMinutes;
-  user.focusTime.pastWeek += durationInMinutes;
-  user.focusTime.pastMonth += durationInMinutes;
-  user.focusTime.pastYear += durationInMinutes;
-
-  await user.save();
   return user;
 }
 

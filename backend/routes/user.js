@@ -1,7 +1,8 @@
 const express = require('express')
 
 // controller functions
-const { loginUser, signupUser } = require('../controllers/userController')
+const { signupUser, loginUser } = require('../controllers/userController')
+//ADD: action controllers --> starting time, logging time, etc.
 
 const router = express.Router()
 
