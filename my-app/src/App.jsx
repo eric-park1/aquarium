@@ -4,7 +4,7 @@ import "./styles/App.css"
 
 
 // pages & components
-import Home from './pages/Home'
+import CountdownTimer from './pages/Home'
 import Landing from './pages/Landing'
 import Login from './pages/UserAuth/Login'
 import Signup from './pages/UserAuth/Signup'
@@ -21,7 +21,7 @@ function App() {
           <Routes>
             <Route 
               path="/" 
-              element={user ? <Home /> : <Navigate to="/login" />} 
+              element={user ? <CountdownTimer /> : <Navigate to="/login" />} 
             />
             <Route 
               path="/login" 

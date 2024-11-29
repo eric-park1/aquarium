@@ -1,7 +1,7 @@
 const express = require('express')
 
 // controller functions
-const { logFocusTime, createSessionUser } = require('../controllers/userController')
+const { timerSuccess, createSessionUser } = require('../controllers/userController')
 //ADD: action controllers --> starting time, logging time, etc.
 
 const router = express.Router()
@@ -11,5 +11,7 @@ const router = express.Router()
 
 // start focus route
 router.post('/createSession', createSessionUser)
+
+router.post('/timerSuccess', timerSuccess)
 
 module.exports = router

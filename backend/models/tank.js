@@ -73,11 +73,11 @@ async function startFocusTime(durationInMinutes, userID) {
   }
 };
 
-tankSchema.statics.createSession =  async function createSession(email, duration, marineType) {
+tankSchema.statics.createSession =  async function createSession(userID, duration, marineType) {
 
-  const user = await User.findOne({ email });
+  const user = await User.findByID({ userID });
   if (!user) {
-    throw new Error('Incorrect email');
+    throw new Error('Incorrect ID');
   }
 
   const currentDate = new Date();
@@ -87,7 +87,7 @@ tankSchema.statics.createSession =  async function createSession(email, duration
   try {
     // Query to find the user's tank for the current month and year
     const currentTank = await Tank.findOne({
-      user: user._id, // The logged-in user's ID
+      user: userID, // The logged-in user's ID
       month: currentMonth, // Current month
       year: currentYear,  // Current year
     })
@@ -102,14 +102,13 @@ tankSchema.statics.createSession =  async function createSession(email, duration
 
   // Create the session
   const session = await session.create({
-    user: user._id,
+    user: userID,
     type: marineType,
     duration: duration,
-    success: false,
-    treePlanted: tree._id,
+    success: false
   });
 
-  const { success, timeLasted } = startFocusTime(duration, user._id);
+  const { success, timeLasted } = startFocusTime(duration, userID);
   if (success) {
     session.success = true;
   } else {

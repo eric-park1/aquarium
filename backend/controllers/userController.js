@@ -51,6 +51,10 @@ const createSessionUser = async (req, res) => {
   }
 }
 
+const timerSuccess = async (req, res) => {
+  
+}
+
 async function resetFocusTimePeriods() {
   const now = new Date();
 
