@@ -6,13 +6,16 @@ export const useTimer = () => {
   const [isLoading, setIsLoading] = useState(null)
   const { dispatch } = useAuthContext()
 
-  const session = async (duration, marineType) => {
+  const session = async (duration, marineType, success) => {
     setIsLoading(true)
     setError(null)
+    
+    let email = null; // Extract userId from localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        email = parsedUser.email // Adjust based on your schema
       } catch (error) {
         console.error("Error parsing user data from localStorage", error);
       }
@@ -21,7 +24,7 @@ export const useTimer = () => {
     const response = await fetch('api/userActions/createSession', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ storedUser, duration, marineType })
+      body: JSON.stringify({ email, duration, marineType, success })
     })
     const json = await response.json()
 

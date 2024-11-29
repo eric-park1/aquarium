@@ -12,6 +12,6 @@ const router = express.Router()
 // start focus route
 router.post('/createSession', createSessionUser)
 
-router.post('/timerSuccess', timerSuccess)
+//router.post('/timerSuccess', timerSuccess)
 
 module.exports = router

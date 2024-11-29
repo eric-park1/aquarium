@@ -41,19 +41,28 @@ const signupUser = async (req, res) => {
 }
 
 const createSessionUser = async (req, res) => {
-  const { userId, duration, marineType } = req.body;
+  const { email, duration, marineType, success } = req.body; // Destructure from req.body
 
   try {
-    const session = Tank.createSession(userID, duration, marineType);
-    console.log("session created")
-  } catch (error) {
-    res.status(400).json({error: error.message})
-  }
-}
+    // Call the Tank's static method to create the session
+    const session = await Tank.createSession(email, duration, marineType, success);
 
-const timerSuccess = async (req, res) => {
-  
-}
+    console.log("Session created successfully:", session);
+    
+    // Respond with the created session data
+    res.status(201).json({
+      message: "Session created successfully",
+      session,
+    });
+  } catch (error) {
+    console.error("Error creating session:", error.message);
+
+    // Respond with error details
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
 
 async function resetFocusTimePeriods() {
   const now = new Date();
