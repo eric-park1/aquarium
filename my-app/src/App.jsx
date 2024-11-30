@@ -9,6 +9,7 @@ import Landing from './pages/Landing'
 import Login from './pages/UserAuth/Login'
 import Signup from './pages/UserAuth/Signup'
 import ThreeScene from './pages/ThreeScene'
+import Tanks from './pages/Tanks'
 
 function App() {
   const { user } = useAuthContext()
@@ -37,7 +38,7 @@ function App() {
             />
             <Route 
               path="/tanks" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+              element={user ? <Tanks /> : <Navigate to="/login" />} 
             />
             <Route 
               path="/shop" 

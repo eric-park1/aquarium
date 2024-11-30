@@ -40,6 +40,35 @@ const signupUser = async (req, res) => {
   }
 }
 
+const getUser = async (req, res) => {
+  const { email } = req.query;
+  try {
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find the user in the database
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Send back the user data (excluding sensitive info like password)
+    res.status(200).json({
+      id: user._id,
+      email: user.email,
+      focusTime: user.focusTime,
+      fishCaught: user.fishCaught,
+      aquarium: user.aquarium,
+      achievements: user.achievements,
+    });
+  } catch (error) {
+    console.error('Error retrieving user:', error.message);
+    res.status(500).json({ error: 'An error occurred while retrieving the user' });
+  }
+};
+
+
 const createSessionUser = async (req, res) => {
   const { email, duration, marineType, success } = req.body; // Destructure from req.body
 
@@ -101,4 +130,4 @@ async function resetFocusTimePeriods() {
   }
 }
 
-module.exports = { signupUser, loginUser, createSessionUser }
+module.exports = { signupUser, loginUser, createSessionUser, getUser }

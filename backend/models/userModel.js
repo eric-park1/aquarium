@@ -49,7 +49,7 @@ const userSchema = new Schema({
   aquarium: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'tank', // Reference to the tank schema
+      ref: 'Tank', // Reference to the tank schema
     },
   ],
   achievements: [
@@ -114,6 +114,29 @@ userSchema.statics.login = async function(email, password) {
   }
 
   return user;
+}
+
+// function: build a hash map, mapping a tank schema to an array of corresponding session schemas
+// this will come in handy when the data is needed to build a UI, for the tank, graph, etc.
+
+
+userSchema.statics.getTanks = async function(userID) {
+  try {
+    const user = await this.findById(userID).populate('aquarium');
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (!user.aquarium || user.aquarium.length === 0) {
+      return []; 
+    }
+
+    return user.aquarium;
+  } catch (error) {
+    console.error('Error fetching achievements:', error.message);
+    throw error;
+  }
 }
 
 module.exports = mongoose.model('User', userSchema);

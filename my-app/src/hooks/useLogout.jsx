@@ -17,3 +17,4 @@ export const useLogout = () => {
 
   return { logout }
 }
+
