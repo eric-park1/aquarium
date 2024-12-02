@@ -134,9 +134,13 @@ userSchema.statics.getTanks = async function(userID) {
 
     return user.aquarium;
   } catch (error) {
-    console.error('Error fetching achievements:', error.message);
+    console.error('Error fetching tanks:', error.message);
     throw error;
   }
+}
+
+userSchema.statics.getAll = async function(userID) {
+  
 }
 
 module.exports = mongoose.model('User', userSchema);

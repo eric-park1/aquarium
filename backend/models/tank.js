@@ -122,6 +122,25 @@ tankSchema.statics.createSession =  async function createSession(email, duration
   return session;
 }
 
+tankSchema.statics.getSessions = async function(tankID) {
+  try {
+    const tank = await this.findById(tankID).populate('organism');
+
+    if (tank) {
+      throw new Error('tank not found');
+    }
+
+    if (!tank.organism || tank.organism.length === 0) {
+      return []; 
+    }
+
+  return tank.organism;
+  } catch (error) {
+    console.error('Error fetching sessions', error.message);
+    throw error;
+  }
+}
+
 //reset tank function: upon the end of the month, will start a new tank
 tankSchema.statics.resetTank = async function (userID) {
   const now = new Date();

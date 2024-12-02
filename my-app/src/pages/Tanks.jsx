@@ -3,6 +3,8 @@ import NavbarSide from "../components/SlidingPane";
 
 import React from 'react';
 
+
+//data will be user schema
 async function getUserByEmail(email) {
     const response = await fetch(`/user?email=${encodeURIComponent(email)}`);
     const data = await response.json();

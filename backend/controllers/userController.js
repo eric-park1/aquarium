@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 // const Session = require('../models/session');
 const Tank = require('../models/tank');
+const Session = require('../models/session');
 const jwt = require('jsonwebtoken');
 
 const createToken = (_id) => {
@@ -41,21 +42,20 @@ const signupUser = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-  const { email } = req.query;
+  const { userId } = req.params;
   try {
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+    if (!userId) {
+      return res.status(400).json({ error: 'couldnt get user id' });
     }
 
     // Find the user in the database
-    const user = await User.findOne({ email });
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     // Send back the user data (excluding sensitive info like password)
     res.status(200).json({
-      id: user._id,
       email: user.email,
       focusTime: user.focusTime,
       fishCaught: user.fishCaught,
@@ -65,6 +65,32 @@ const getUser = async (req, res) => {
   } catch (error) {
     console.error('Error retrieving user:', error.message);
     res.status(500).json({ error: 'An error occurred while retrieving the user' });
+  }
+};
+
+const getTank = async (req, res) => {
+  const { tankId } = req.params; // Assuming the userId is sent as a route parameter
+
+  try {
+    // Find tanks where the `user` field matches the provided userId
+    const tank = await Tank.findById(tankId);
+
+    res.status(200).json(tank); // Send the tank documents as JSON response
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getSession = async (req, res) => {
+  const { sessionId } = req.params; // Assuming the userId is sent as a route parameter
+
+  try {
+    // Find tanks where the `user` field matches the provided userId
+    const session = await Session.findbyId(sessionId);
+
+    res.status(200).json(session); // Send the tank documents as JSON response
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -92,6 +118,8 @@ const createSessionUser = async (req, res) => {
     });
   }
 };
+
+
 
 async function resetFocusTimePeriods() {
   const now = new Date();
@@ -130,4 +158,4 @@ async function resetFocusTimePeriods() {
   }
 }
 
-module.exports = { signupUser, loginUser, createSessionUser, getUser }
+module.exports = { signupUser, loginUser, createSessionUser, getUser, getTank, getSession }
