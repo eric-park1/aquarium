@@ -120,27 +120,4 @@ userSchema.statics.login = async function(email, password) {
 // this will come in handy when the data is needed to build a UI, for the tank, graph, etc.
 
 
-userSchema.statics.getTanks = async function(userID) {
-  try {
-    const user = await this.findById(userID).populate('aquarium');
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    if (!user.aquarium || user.aquarium.length === 0) {
-      return []; 
-    }
-
-    return user.aquarium;
-  } catch (error) {
-    console.error('Error fetching tanks:', error.message);
-    throw error;
-  }
-}
-
-userSchema.statics.getAll = async function(userID) {
-  
-}
-
 module.exports = mongoose.model('User', userSchema);

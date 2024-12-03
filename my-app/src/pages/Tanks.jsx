@@ -43,8 +43,8 @@ async function getAllSessions(email) {
     //after succesfully getting tank data, get the corresponding tank.organims which is the session schema data
     const sessionArrays = await Promise.all(
       tankDataArray.map(async (tank) => {
-        if (tank.organisms && Array.isArray(tank.organisms)) {
-          const sessionPromises = tank.organisms.map(async (sessionId) => {
+        if (tank.organism && Array.isArray(tank.organism)) {
+          const sessionPromises = tank.organism.map(async (sessionId) => {
             try {
               const response = await fetch(`/api/user/session/${sessionId}`);
               if (!response.ok) {
@@ -107,7 +107,7 @@ const Tanks = () => {
     }
   }, []);
 
-  const n = tankArray ? tankArray.length : 0;
+  const n = sessionArray ? sessionArray.reduce((total, sessions) => total + sessions.length, 0) : 0;
 
   const renderSquare = (row, col, n) => {
     const isBlack = (row + col) % 2 === 1;

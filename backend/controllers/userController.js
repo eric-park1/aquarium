@@ -41,19 +41,6 @@ const signupUser = async (req, res) => {
   }
 }
 
-const getUser = async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    // Find tanks where the `user` field matches the provided userId
-    const user = await User.findById(userId);
-
-    res.status(200).json(user); // Send the user documents as JSON response
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 const getTank = async (req, res) => {
   const { tankId } = req.params; 
 
@@ -157,4 +144,4 @@ async function resetFocusTimePeriods() {
   }
 }
 
-module.exports = { signupUser, loginUser, createSessionUser, getUser, getTank, getSession, getUserId }
+module.exports = { signupUser, loginUser, createSessionUser, getTank, getSession, getUserId }

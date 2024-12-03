@@ -47,32 +47,6 @@ async function logFocusTime(durationInMinutes, userID) {
   return user;
 }
 
-async function startFocusTime(durationInMinutes, userID) {
-  const startTime = Date.now(); // Record the start time
-  const durationInMilliseconds = durationInMinutes * 60 * 1000;
-
-  try {
-      console.log(`Timer started for ${durationInMinutes} minutes...`);
-
-      // Simulate the timer with a Promise
-      await new Promise((resolve, reject) => {
-          const timer = setTimeout(() => {
-              clearTimeout(timer);
-              resolve(); // Timer completed successfully
-          }, durationInMilliseconds);
-      });
-
-      console.log("Timer completed!");
-      logFocusTime(durationInMinutes, userID);
-      return { success: true, timeLasted: durationInMinutes }; // Timer completed successfully
-  } catch (error) {
-      const elapsedTime = Date.now() - startTime; // Calculate elapsed time
-      console.error("Timer interrupted or failed:", error);
-      logFocusTime(elapsedTime / 1000 / 60, userID);
-      return { success: false, timeLasted: elapsedTime / 1000 / 60 }; // Return elapsed time in minutes
-  }
-};
-
 tankSchema.statics.createSession =  async function createSession(email, duration, marineType, success) {
 
   const User = require("./userModel"); // Ensure this points to your User schema
