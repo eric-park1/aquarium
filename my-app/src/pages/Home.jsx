@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import NavbarSide from "../components/SlidingPane";
 
-import { useTimer } from "../hooks/useTimer"
-
+import { useTimer } from "../hooks/useTimer";
 
 const CountdownTimer = () => {
   // Reference to track interval ID
@@ -10,10 +9,11 @@ const CountdownTimer = () => {
 
   // State variables
   const [timer, setTimer] = useState("00:00:00");
-  const [marineType, setMarineType] = useState('');
-  const [duration, setDuration] = useState('');
+  const [marineType, setMarineType] = useState("");
+  const [duration, setDuration] = useState("");
   const [isActive, setIsActive] = useState(false);
-  const { session, isLoading, error } = useTimer();
+  const [timeFocused, setTimeFocused] = useState(0);
+  const { session } = useTimer();
 
   // Function to calculate time remaining
   const getTimeRemaining = (endTime) => {
@@ -33,7 +33,6 @@ const CountdownTimer = () => {
   const startTimer = (endTime) => {
     const { total, hours, minutes, seconds } = getTimeRemaining(endTime);
     if (total >= 0) {
-      //session(total, marineType)
       setTimer(
         `${hours > 9 ? hours : "0" + hours}:${
           minutes > 9 ? minutes : "0" + minutes
@@ -42,7 +41,7 @@ const CountdownTimer = () => {
     } else {
       clearInterval(Ref.current);
       setIsActive(false);
-      session(total, marineType, true);
+      session(timeFocused + 1, marineType, true);
       alert("Time's up!");
     }
   };
@@ -70,11 +69,27 @@ const CountdownTimer = () => {
       alert("Please enter a valid duration in minutes.");
       return;
     }
+    setTimeFocused(parseInt(duration, 10)); // Save the initial focus duration
     setIsActive(true);
-    
-    //session(duration, marineType)
     clearTimer(getDeadTime());
-    
+  };
+
+  // Function to handle timer stop
+  const handleStop = () => {
+    if (Ref.current) clearInterval(Ref.current); // Clear the interval
+  
+    const [hours, minutes, seconds] = timer.split(":").map((unit) => parseInt(unit, 10));
+    const remainingMinutes = hours * 60 + minutes + (seconds > 0 ? 1 : 0); // Round up if there's any leftover seconds
+  
+    // Calculate elapsed time in whole minutes
+    const elapsedMinutes = Math.max(0, timeFocused - remainingMinutes);
+  
+    session(elapsedMinutes, marineType, false); // Log session with "false"
+    console.log("Minutes Focused:", elapsedMinutes);
+  
+    setTimer("00:00:00");
+    setIsActive(false);
+    setTimeFocused(0);
   };
 
   return (
@@ -89,7 +104,7 @@ const CountdownTimer = () => {
         />
       </label>
       <label>
-          Marine Type: {' '}
+        Marine Type:{" "}
         <input
           type="text"
           value={marineType}
@@ -112,8 +127,22 @@ const CountdownTimer = () => {
       >
         {isActive ? "Timer Running..." : "Start Timer"}
       </button>
-      <div className="page-container">
-           <NavbarSide />
+      <button
+        onClick={handleStop}
+        disabled={!isActive}
+        style={{
+          margin: "10px",
+          padding: "10px 20px",
+          backgroundColor: isActive ? "#ff0000" : "gray",
+          color: "white",
+          border: "none",
+          cursor: isActive ? "pointer" : "not-allowed",
+        }}
+      >
+        Stop Timer
+      </button>
+      <div>
+        <NavbarSide />
       </div>
     </div>
   );

@@ -81,12 +81,15 @@ async function getAllSessions(email) {
 
 
 
+
+
 const Tanks = () => {
   const [tankArray, setTankArray] = useState(null);
   const [sessionArray, setSessionArray] = useState(null);
 
   const rows = 8; 
   const columns = 8;
+  let n = 0;
 
   useEffect(() => {
     let email = null;
@@ -101,13 +104,46 @@ const Tanks = () => {
         }).catch((error) => {
           console.error("Error fetching session data:", error);
         });
+        
       } catch (error) {
         console.error("Error parsing user data from localStorage", error);
       }
     }
   }, []);
 
-  const n = sessionArray ? sessionArray.reduce((total, sessions) => total + sessions.length, 0) : 0;
+  n = sessionArray ? sessionArray.reduce((total, sessions) => total + sessions.length, 0) : 0;
+
+  // Initialize an empty object to group sessions by month and year
+  const focusTimeByMonth = {};
+
+  //create an array of arrays, where each array is a 31 length array with focus durations of each day in the month
+  if (sessionArray) {
+    sessionArray.forEach((sessions) => {
+      sessions.forEach((session) => {
+        if (session.createdAt && session.duration) {
+          const sessionDate = new Date(session.createdAt);
+          const year = sessionDate.getFullYear();
+          const month = sessionDate.getMonth();
+          const day = sessionDate.getDate();
+
+          const key = `${year}-${month}`; // Unique key for each month of a year
+
+          // Initialize the month's array if it doesn't exist
+          if (!focusTimeByMonth[key]) {
+            focusTimeByMonth[key] = Array(31).fill(0); // Max 31 days per month
+          }
+
+          // Accumulate the duration in the corresponding day's index
+          focusTimeByMonth[key][day - 1] += session.duration;
+        }
+      });
+    });
+  }
+
+  // Convert the focusTimeByMonth object to an array of arrays
+  const focusTimeByMonthArray = Object.values(focusTimeByMonth);
+
+  console.log(focusTimeByMonthArray);
 
   const renderSquare = (row, col, n) => {
     const isBlack = (row + col) % 2 === 1;

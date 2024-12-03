@@ -33,7 +33,6 @@ export const useTimer = () => {
       setError(json.error)
     }
     if (response.ok) {
-
       return true
     }
   }
