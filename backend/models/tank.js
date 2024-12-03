@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Session = require('./session');
+//const Session = require('./session');
 const User = require('./userModel');
 
 const tankSchema = new mongoose.Schema({
@@ -79,7 +79,7 @@ tankSchema.statics.createSession =  async function createSession(email, duration
   const Session = require("./session");
 
   // Validate user existence
-  const user = await User.findOne({email: email});
+  const user = await User.findOne({ email: email });
   if (!user) {
     throw new Error("User not found with the provided email");
   }
@@ -95,6 +95,13 @@ tankSchema.statics.createSession =  async function createSession(email, duration
     { $setOnInsert: { user: user._id, month: currentMonth, year: currentYear, organism: [] } },
     { new: true, upsert: true }
   );
+
+  // Add the tank ID to the user's aquarium
+  if (!user.aquarium.includes(currentTank._id)) {
+    user.aquarium.push(currentTank._id);
+    user.markModified('aquarium'); // Ensure the aquarium field is marked as modified
+    await user.save();
+  }
 
   // Create the session
   const session = await Session.create({
@@ -112,12 +119,13 @@ tankSchema.statics.createSession =  async function createSession(email, duration
     currentTank.totalCatches += 1;
   }
 
-  // Update the user stats (optional, depends on your application requirements)
-  user.totalFocusTime = (user.totalFocusTime || 0) + duration;
-  await user.save();
-
   // Save the updated tank
   await currentTank.save();
+
+  // Update the user stats (optional, depends on your application requirements)
+  //this needs to be changed
+  user.totalFocusTime = (user.totalFocusTime || 0) + duration;
+  await user.save();
 
   return session;
 }

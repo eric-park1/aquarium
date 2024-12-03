@@ -1,60 +1,154 @@
 //import React, { useState, useRef, useEffect } from "react";
 import NavbarSide from "../components/SlidingPane";
 
-import React from 'react';
+import { useState, useEffect } from 'react'
+import fish from "../assets/fish.png";
 
 
-//data will be user schema
-async function getUserByEmail(email) {
-    const response = await fetch(`/user?email=${encodeURIComponent(email)}`);
-    const data = await response.json();
-
-    if (response.ok) {
-        console.log('User data:', data);
-    } else {
-        console.error('Error fetching user:', data.error);
+//get array of session in each tank
+async function getAllSessions(email) {
+  //gets user schema data
+  try {
+    const userFromEmail = await fetch(`/api/user/email/${email}`);
+    if (!userFromEmail.ok) {
+      throw new Error("Failed to fetch user data with id ${email}");
     }
-    return data;
+    const userData = await userFromEmail.json();
+    if (!userData) {
+      console.log('your mom')
+    }
+
+    // const userResponse = await fetch(`/api/user/${user}`);
+    // if (!userResponse.ok) {
+    //   throw new Error("Failed to fetch user data");
+    // }
+    // const userData = await userResponse.json();
+
+    //after successfully getting user data, get user.aquarium, which is the corresponding tank schema data
+    const tankPromises = userData.aquarium.map(async (tankId) => {
+      try {
+        const response = await fetch(`/api/user/tank/${tankId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch tank with ID: ${tankId}`);
+        }
+        return response.json();
+      } catch (error) {
+        console.error(`Error getting tank data for ID: ${tankId}`, error);
+        return null; 
+      }
+    });
+
+    const tankDataArray = (await Promise.all(tankPromises)).filter((tank) => tank !== null);
+
+    //after succesfully getting tank data, get the corresponding tank.organims which is the session schema data
+    const sessionArrays = await Promise.all(
+      tankDataArray.map(async (tank) => {
+        if (tank.organisms && Array.isArray(tank.organisms)) {
+          const sessionPromises = tank.organisms.map(async (sessionId) => {
+            try {
+              const response = await fetch(`/api/user/session/${sessionId}`);
+              if (!response.ok) {
+                throw new Error(`Failed to fetch session with ID: ${sessionId}`);
+              }
+              return response.json();
+            } catch (error) {
+              console.error(`Error fetching session data for ID: ${sessionId}`, error);
+              return null;
+            }
+          });
+
+          //wait until all promises are resolved
+          const resolvedSessions = await Promise.all(sessionPromises);
+          return resolvedSessions.filter((session) => session !== null);
+        } else {
+          return []; // If no sessions, return an empty array
+        }
+      })
+    );
+    console.log(tankDataArray);
+    console.log(sessionArrays);
+
+    return {
+      tankDataArray,
+      sessionArrays,
+    }; //tankDataArray is an array of each tank schema, and sessionArrays is an array of arrays
+  } catch (error) {
+    console.error("Error fetching tanks and sessions", error);
+    throw error; // Re-throw the error to handle it outside
+  }
+
 };
 
+
+
 const Tanks = () => {
+  const [tankArray, setTankArray] = useState(null);
+  const [sessionArray, setSessionArray] = useState(null);
+
   const rows = 8; 
   const columns = 8;
 
-  let email = null; // Extract userId from localStorage
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
+  useEffect(() => {
+    let email = null;
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
       try {
-      const parsedUser = JSON.parse(storedUser);
-      email = parsedUser.email // Adjust based on your schema
-     } catch (error) {
-      console.error("Error parsing user data from localStorage", error);
+        const parsedUser = JSON.parse(storedUser);
+        email = parsedUser.email;
+        getAllSessions(email).then((data) => {
+          setTankArray(data.tankDataArray);
+          setSessionArray(data.sessionArrays);
+        }).catch((error) => {
+          console.error("Error fetching session data:", error);
+        });
+      } catch (error) {
+        console.error("Error parsing user data from localStorage", error);
+      }
     }
-  }
-//   const data = getUserByEmail(email); // data will be user schema data
-//   if (data) {
-//     const user = await User.findById(userId).populate('achievements');
-//   }
+  }, []);
 
-//   if (data && data.aquarium.length > 0) {
-//       data.aquarium.forEach()
-//   }
+  const n = tankArray ? tankArray.length : 0;
 
-  const renderSquare = (row, col) => {
+  const renderSquare = (row, col, n) => {
     const isBlack = (row + col) % 2 === 1;
     const squareStyle = { 
       backgroundColor: isBlack ? 'black' : 'white',
       width: '50px',
-      height: '50px'
+      height: '50px',
+      position: 'relative', // Enables positioning for the image
     };
-
-    return <div key={`${row}-${col}`} style={squareStyle}></div>;
+  
+    const imageStyle = {
+      width: '30px',
+      height: '30px',
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)', // Centers the image
+      pointerEvents: 'none', // Ensures the image doesn’t interfere with clicks
+    };
+  
+    // Calculate the index of the current square in a flat array representation
+    const index = row * columns + col;
+  
+    // Render an image if the current index is less than n
+    return (
+      <div key={`${row}-${col}`} style={squareStyle}>
+        {index < n && (
+          <img 
+            src={fish}
+            alt={`square-${row}-${col}`} 
+            style={imageStyle} 
+          />
+        )}
+      </div>
+    );
   };
-
+  
   const renderRow = (row) => {
     return (
       <div key={row} style={{ display: 'flex' }}>
-        {Array.from(Array(columns), (_, col) => renderSquare(row, col))}
+        {Array.from(Array(columns), (_, col) => renderSquare(row, col, n))}
       </div>
     );
   };

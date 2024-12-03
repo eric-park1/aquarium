@@ -43,33 +43,19 @@ const signupUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   const { userId } = req.params;
+
   try {
-    if (!userId) {
-      return res.status(400).json({ error: 'couldnt get user id' });
-    }
-
-    // Find the user in the database
+    // Find tanks where the `user` field matches the provided userId
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
 
-    // Send back the user data (excluding sensitive info like password)
-    res.status(200).json({
-      email: user.email,
-      focusTime: user.focusTime,
-      fishCaught: user.fishCaught,
-      aquarium: user.aquarium,
-      achievements: user.achievements,
-    });
+    res.status(200).json(user); // Send the user documents as JSON response
   } catch (error) {
-    console.error('Error retrieving user:', error.message);
-    res.status(500).json({ error: 'An error occurred while retrieving the user' });
+    res.status(500).json({ error: error.message });
   }
 };
 
 const getTank = async (req, res) => {
-  const { tankId } = req.params; // Assuming the userId is sent as a route parameter
+  const { tankId } = req.params; 
 
   try {
     // Find tanks where the `user` field matches the provided userId
@@ -78,21 +64,35 @@ const getTank = async (req, res) => {
     res.status(200).json(tank); // Send the tank documents as JSON response
   } catch (error) {
     res.status(500).json({ error: error.message });
+    console.log("couldnt get tank")
   }
 };
 
 const getSession = async (req, res) => {
-  const { sessionId } = req.params; // Assuming the userId is sent as a route parameter
-
+  const { sessionId } = req.params;
   try {
     // Find tanks where the `user` field matches the provided userId
-    const session = await Session.findbyId(sessionId);
+    const session = await Session.findById(sessionId);
 
-    res.status(200).json(session); // Send the tank documents as JSON response
+    res.status(200).json(session); // Send the session documents as JSON response
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+const getUserId = async (req, res) => {
+  const { email } = req.params;
+  try {
+    // Find user where the `email` field matches the provided userId
+    const user = await User.findOne({ email });
+    console.log(user);
+
+    res.status(200).json(user); // Send the user documents as JSON response
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+    console.log("couldnt get user")
+  }
+}
 
 
 const createSessionUser = async (req, res) => {
@@ -118,7 +118,6 @@ const createSessionUser = async (req, res) => {
     });
   }
 };
-
 
 
 async function resetFocusTimePeriods() {
@@ -158,4 +157,4 @@ async function resetFocusTimePeriods() {
   }
 }
 
-module.exports = { signupUser, loginUser, createSessionUser, getUser, getTank, getSession }
+module.exports = { signupUser, loginUser, createSessionUser, getUser, getTank, getSession, getUserId }
