@@ -1,5 +1,6 @@
 //import React, { useState, useRef, useEffect } from "react";
 import NavbarSide from "../components/SlidingPane";
+import BarChartComponent from "../components/ChartSession";
 
 import { useState, useEffect } from 'react'
 import fish from "../assets/fish.png";
@@ -17,12 +18,6 @@ async function getAllSessions(email) {
     if (!userData) {
       console.log('your mom')
     }
-
-    // const userResponse = await fetch(`/api/user/${user}`);
-    // if (!userResponse.ok) {
-    //   throw new Error("Failed to fetch user data");
-    // }
-    // const userData = await userResponse.json();
 
     //after successfully getting user data, get user.aquarium, which is the corresponding tank schema data
     const tankPromises = userData.aquarium.map(async (tankId) => {
@@ -144,6 +139,7 @@ const Tanks = () => {
   const focusTimeByMonthArray = Object.values(focusTimeByMonth);
 
   console.log(focusTimeByMonthArray);
+  console.log(focusTimeByMonthArray[0]);
 
   const renderSquare = (row, col, n) => {
     const isBlack = (row + col) % 2 === 1;
@@ -190,15 +186,36 @@ const Tanks = () => {
   };
 
   return (
-    <div>
-        <div>
-            {Array.from(Array(rows), (_, row) => renderRow(row))}
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      {/* Navbar */}
+      <div style={{ flexShrink: 0 }}>
+        <NavbarSide />
+      </div>
+
+      <div className="button-bar">
+        <button>Button 1</button>
+        <button>Button 2</button>
+        <button>Button 3</button>
+      </div>
+  
+      {/* Main Content Area */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Top Half: Array */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {tankArray && sessionArray
+            ? Array.from(Array(rows), (_, row) => renderRow(row))
+            : <p>Loading tank data...</p>}
         </div>
-        <div>
-            <NavbarSide />
+  
+        {/* Bottom Half: Chart */}
+        <div style={{ flex: 1 }}>
+          {focusTimeByMonthArray[0] 
+            ? <BarChartComponent dataArray={focusTimeByMonthArray[0]} />
+            : <p>Loading chart data...</p>}
         </div>
+      </div>
     </div>
-  );
+  );  
 };
 
 export default Tanks;
