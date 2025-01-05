@@ -41,8 +41,9 @@ const CountdownTimer = () => {
     } else {
       clearInterval(Ref.current);
       setIsActive(false);
-      session(timeFocused + 1, marineType, true);
+      session(duration, marineType, true);
       alert("Time's up!");
+      setDuration(0);
     }
   };
 

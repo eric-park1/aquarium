@@ -5,7 +5,6 @@ import BarChartComponent from "../components/ChartSession";
 import { useState, useEffect } from 'react'
 import fish from "../assets/fish.png";
 
-
 //get array of session in each tank
 async function getAllSessions(email) {
   //gets user schema data
@@ -16,76 +15,200 @@ async function getAllSessions(email) {
     }
     const userData = await userFromEmail.json();
     if (!userData) {
-      console.log('your mom')
+      console.log('couldnt get user from email')
     }
 
-    //after successfully getting user data, get user.aquarium, which is the corresponding tank schema data
-    const tankPromises = userData.aquarium.map(async (tankId) => {
-      try {
-        const response = await fetch(`/api/user/tank/${tankId}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch tank with ID: ${tankId}`);
-        }
-        return response.json();
-      } catch (error) {
-        console.error(`Error getting tank data for ID: ${tankId}`, error);
-        return null; 
-      }
-    });
+    let response = await fetch(`/api/user/daytank/${userData.dayTank}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tank with ID: ${userData.dayTank}`);
+    }
+    const dayTank = await response.json();
 
-    const tankDataArray = (await Promise.all(tankPromises)).filter((tank) => tank !== null);
+    response = await fetch(`/api/user/weektank/${userData.weekTank}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tank with ID: ${userData.weekTank}`);
+    }
+    const weekTank = await response.json();
 
-    //after succesfully getting tank data, get the corresponding tank.organims which is the session schema data
-    const sessionArrays = await Promise.all(
-      tankDataArray.map(async (tank) => {
-        if (tank.organism && Array.isArray(tank.organism)) {
-          const sessionPromises = tank.organism.map(async (sessionId) => {
-            try {
-              const response = await fetch(`/api/user/session/${sessionId}`);
-              if (!response.ok) {
-                throw new Error(`Failed to fetch session with ID: ${sessionId}`);
-              }
-              return response.json();
-            } catch (error) {
-              console.error(`Error fetching session data for ID: ${sessionId}`, error);
-              return null;
+    response = await fetch(`/api/user/monthtank/${userData.monthTank}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tank with ID: ${userData.monthTank}`);
+    }
+    const monthTank = await response.json();
+
+    response = await fetch(`/api/user/yeartank/${userData.yearTank}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tank with ID: ${userData.yearTank}`);
+    }
+    const yearTank = await response.json();
+
+    const fetchSessions = async (tank) => {
+      if (tank?.focusEvents && Array.isArray(tank.focusEvents)) {
+        const sessionPromises = tank.focusEvents.map(async (sessionId) => {
+          try {
+            const response = await fetch(`/api/user/session/${sessionId}`);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch session with ID: ${sessionId}`);
             }
-          });
-
-          //wait until all promises are resolved
-          const resolvedSessions = await Promise.all(sessionPromises);
-          return resolvedSessions.filter((session) => session !== null);
-        } else {
-          return []; // If no sessions, return an empty array
-        }
-      })
-    );
-    console.log(tankDataArray);
-    console.log(sessionArrays);
+            return response.json();
+          } catch (error) {
+            console.error(`Error fetching session data for ID: ${sessionId}`, error);
+            return null;
+          }
+        });
+        const resolvedSessions = await Promise.all(sessionPromises);
+        return resolvedSessions.filter((session) => session !== null);
+      }
+      return [];
+    };
+    
+    const [daySession, weekSession, monthSession, yearSession] = await Promise.all([
+      fetchSessions(dayTank),
+      fetchSessions(weekTank),
+      fetchSessions(monthTank),
+      fetchSessions(yearTank)
+    ]);
 
     return {
-      tankDataArray,
-      sessionArrays,
-    }; //tankDataArray is an array of each tank schema, and sessionArrays is an array of arrays
+      dayTank,
+      weekTank,
+      monthTank,
+      yearTank,
+      daySession,
+      weekSession,
+      monthSession,
+      yearSession
+    };
   } catch (error) {
     console.error("Error fetching tanks and sessions", error);
     throw error; // Re-throw the error to handle it outside
   }
+};
 
+const sessionRecord = (daySessions, weekSessions, monthSessions, yearSessions) => {
+  const getStartOfDay = (date) => {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  };
+
+  const getStartOfWeek = (date) => {
+    const start = new Date(date);
+    const day = start.getDay(); // 0 = Sunday
+    start.setDate(start.getDate() - day); // Adjust to Sunday
+    start.setHours(0, 0, 0, 0);
+    return start;
+  };
+
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+
+  const fillArray = (sessions, arrayLength, unitInMilliseconds, getIndex, maxValue) => {
+    const result = new Array(arrayLength).fill(0);
+
+    sessions.forEach(({ createdAt, duration }) => {
+      const startTime = new Date(createdAt);
+      let remainingDuration = duration;
+      let currentTime = startTime;
+
+      while (remainingDuration > 0) {
+        const unitStart = new Date(currentTime);
+        unitStart.setMilliseconds(0);
+        const unitEnd = new Date(unitStart.getTime() + unitInMilliseconds);
+
+        const index = getIndex(currentTime);
+        if (index < 0 || index >= arrayLength) break;
+
+        const timeRemainingInUnit = (unitEnd - currentTime) / (1000 * 60); // Time left in unit in minutes
+        const timeToAdd = Math.min(remainingDuration, timeRemainingInUnit);
+
+        result[index] += timeToAdd;
+        result[index] = Math.min(result[index], maxValue); // Cap at maxValue
+
+        remainingDuration -= timeToAdd;
+        currentTime = new Date(currentTime.getTime() + timeToAdd * 60 * 1000); // Advance time
+      }
+    });
+
+    return result;
+  };
+
+  // Day Array (24 hours, max 60 minutes per hour)
+  const dayArray = fillArray(
+    daySessions,
+    24,
+    60 * 60 * 1000, // 1 hour in milliseconds
+    (time) => time.getHours(),
+    60
+  );
+
+  // Week Array (7 days, max 24 hours per day)
+  const weekArray = fillArray(
+    weekSessions,
+    7,
+    24 * 60 * 60 * 1000, // 1 day in milliseconds
+    (time) => {
+      const startOfWeek = getStartOfWeek(time);
+      return Math.floor((time - startOfWeek) / (24 * 60 * 60 * 1000));
+    },
+    24 * 60
+  );
+
+  // Month Array (variable days, max 24 hours per day)
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+  const monthArray = fillArray(
+    monthSessions,
+    daysInMonth,
+    24 * 60 * 60 * 1000, // 1 day in milliseconds
+    (time) => {
+      const startOfMonth = new Date(time.getFullYear(), time.getMonth(), 1);
+      return Math.floor((time - startOfMonth) / (24 * 60 * 60 * 1000));
+    },
+    24 * 60
+  );
+
+  // Year Array (12 months, max 744 hours per month (31 days x 24 hours))
+  const yearArray = new Array(12).fill(0);
+  yearSessions.forEach(({ createdAt, duration }) => {
+    const time = new Date(createdAt);
+    const monthIndex = time.getMonth();
+    yearArray[monthIndex] += duration / 60; // Convert to hours
+  });
+
+  yearArray.forEach((hours, index) => {
+    yearArray[index] = Math.floor(hours); // Round down to nearest hour
+  });
+
+  return { dayArray, weekArray, monthArray, yearArray };
 };
 
 
-
-
-
 const Tanks = () => {
-  const [tankArray, setTankArray] = useState(null);
-  const [sessionArray, setSessionArray] = useState(null);
+  const [state, setState] = useState({
+    dayTank: null,
+    weekTank: null,
+    monthTank: null,
+    yearTank: null,
+    daySession: null,
+    weekSession: null,
+    monthSession: null,
+    yearSession: null,
+  });
+
+  const [focusTimeByDay, setFocusTimeByDay] = useState([]);
+  const [focusTimeByWeek, setFocusTimeByWeek] = useState([]);
+  const [focusTimeByMonth, setFocusTimeByMonth] = useState([]);
+  const [focusTimeByYear, setFocusTimeByYear] = useState([]);
+
+  const [activeComponent, setActiveComponent] = useState('day'); // Default active component
 
   const rows = 8; 
   const columns = 8;
-  let n = 0;
 
+  const [n, setN] = useState(0); // Track number of fish to display based on selected view
+
+  // This useEffect fetches the data when the component mounts
   useEffect(() => {
     let email = null;
     const storedUser = localStorage.getItem("user");
@@ -94,54 +217,58 @@ const Tanks = () => {
         const parsedUser = JSON.parse(storedUser);
         email = parsedUser.email;
         getAllSessions(email).then((data) => {
-          setTankArray(data.tankDataArray);
-          setSessionArray(data.sessionArrays);
-        }).catch((error) => {
-          console.error("Error fetching session data:", error);
-        });
-        
+          const { dayTank, weekTank, monthTank, yearTank, daySession, weekSession, monthSession, yearSession } = data;
+          setState({
+            dayTank,
+            weekTank,
+            monthTank,
+            yearTank,
+            daySession,
+            weekSession,
+            monthSession,
+            yearSession,
+          });
+
+          const { dayArray, weekArray, monthArray, yearArray } = sessionRecord(daySession, weekSession, monthSession, yearSession)
+
+          // Set focusTime arrays
+          setFocusTimeByDay(dayArray);
+          setFocusTimeByWeek(weekArray);
+          setFocusTimeByMonth(monthArray);
+          setFocusTimeByYear(yearArray);
+        }).catch(console.error);
       } catch (error) {
         console.error("Error parsing user data from localStorage", error);
       }
     }
   }, []);
 
-  n = sessionArray ? sessionArray.reduce((total, sessions) => total + sessions.length, 0) : 0;
+  // Update the value of `n` based on the active component (e.g., day, week, month, year)
+  useEffect(() => {
+    let sessionData = [];
+    
+    switch (activeComponent) {
+      case 'day':
+        sessionData = state.daySession;
+        break;
+      case 'week':
+        sessionData = state.weekSession;
+        break;
+      case 'month':
+        sessionData = state.monthSession;
+        break;
+      case 'year':
+        sessionData = state.yearSession;
+        break;
+      default:
+        break;
+    }
+    console.log(`Active Component: ${activeComponent}, Session Data:`, sessionData);
+    setN(sessionData ? sessionData.length : 0); // Update `n` based on session data
+  }, [activeComponent, state]);
 
-  // Initialize an empty object to group sessions by month and year
-  const focusTimeByMonth = {};
-
-  //create an array of arrays, where each array is a 31 length array with focus durations of each day in the month
-  if (sessionArray) {
-    sessionArray.forEach((sessions) => {
-      sessions.forEach((session) => {
-        if (session.createdAt && session.duration) {
-          const sessionDate = new Date(session.createdAt);
-          const year = sessionDate.getFullYear();
-          const month = sessionDate.getMonth();
-          const day = sessionDate.getDate();
-
-          const key = `${year}-${month}`; // Unique key for each month of a year
-
-          // Initialize the month's array if it doesn't exist
-          if (!focusTimeByMonth[key]) {
-            focusTimeByMonth[key] = Array(31).fill(0); // Max 31 days per month
-          }
-
-          // Accumulate the duration in the corresponding day's index
-          focusTimeByMonth[key][day - 1] += session.duration;
-        }
-      });
-    });
-  }
-
-  // Convert the focusTimeByMonth object to an array of arrays
-  const focusTimeByMonthArray = Object.values(focusTimeByMonth);
-
-  console.log(focusTimeByMonthArray);
-  console.log(focusTimeByMonthArray[0]);
-
-  const renderSquare = (row, col, n) => {
+  // Render each square, with fish images depending on `n`
+  const renderSquare = (row, col) => {
     const isBlack = (row + col) % 2 === 1;
     const squareStyle = { 
       backgroundColor: isBlack ? 'black' : 'white',
@@ -180,7 +307,54 @@ const Tanks = () => {
   const renderRow = (row) => {
     return (
       <div key={row} style={{ display: 'flex' }}>
-        {Array.from(Array(columns), (_, col) => renderSquare(row, col, n))}
+        {Array.from(Array(columns), (_, col) => renderSquare(row, col))}
+      </div>
+    );
+  };
+
+  // ViewComponent renders the chart based on active view
+  const ViewComponent = ({ viewType }) => {
+    let chartContent;
+    switch (viewType) {
+      case 'day':
+        chartContent = state.daySession && n > 0 ? (
+          <BarChartComponent dataArray={focusTimeByDay} />
+        ) : (
+          <p>Loading day chart data...</p>
+        );
+        break;
+      case 'week':
+        chartContent = state.weekSession && n > 0 ? (
+          <BarChartComponent dataArray={focusTimeByWeek} />
+        ) : (
+          <p>Loading week chart data...</p>
+        );
+        break;
+      case 'month':
+        chartContent = state.monthSession && n > 0 ? (
+          <BarChartComponent dataArray={focusTimeByMonth} />
+        ) : (
+          <p>Loading month chart data...</p>
+        );
+        break;
+      case 'year':
+        chartContent = state.yearSession && n > 0 ? (
+          <BarChartComponent dataArray={focusTimeByYear} />
+        ) : (
+          <p>Loading year chart data...</p>
+        );
+        break;
+      default:
+        chartContent = <p>Select a valid view type.</p>;
+    }
+
+    return (
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Main Content Area */}
+        <div style={{ flex: 1 }}>
+          {/* Display the appropriate chart content based on the viewType */}
+          {chartContent}
+        </div>
       </div>
     );
   };
@@ -192,26 +366,25 @@ const Tanks = () => {
         <NavbarSide />
       </div>
 
-      <div className="button-bar">
-        <button>Button 1</button>
-        <button>Button 2</button>
-        <button>Button 3</button>
+      <div className="button-bar" style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
+        <button onClick={() => setActiveComponent('day')}>Day View</button>
+        <button onClick={() => setActiveComponent('week')}>Week View</button>
+        <button onClick={() => setActiveComponent('month')}>Month View</button>
+        <button onClick={() => setActiveComponent('year')}>Year View</button>
       </div>
   
       {/* Main Content Area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         {/* Top Half: Array */}
         <div style={{ flex: 1, overflowY: "auto" }}>
-          {tankArray && sessionArray
+          {state.daySession || state.weekSession || state.monthSession || state.yearSession
             ? Array.from(Array(rows), (_, row) => renderRow(row))
             : <p>Loading tank data...</p>}
         </div>
   
         {/* Bottom Half: Chart */}
         <div style={{ flex: 1 }}>
-          {focusTimeByMonthArray[0] 
-            ? <BarChartComponent dataArray={focusTimeByMonthArray[0]} />
-            : <p>Loading chart data...</p>}
+          <ViewComponent viewType={activeComponent} />
         </div>
       </div>
     </div>

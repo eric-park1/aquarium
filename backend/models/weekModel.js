@@ -8,6 +8,10 @@ const weekSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   }, 
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
   focusEvents: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,3 +19,5 @@ const weekSchema = new mongoose.Schema({
     },
   ],
 });
+
+module.exports = mongoose.model('weekTank', weekSchema);

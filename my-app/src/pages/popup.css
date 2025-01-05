@@ -1,0 +1,26 @@
+.popup {
+    position: fixed; /* Keeps it fixed on the screen */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for focus */
+    display: flex; /* Flexbox for centering */
+    justify-content: center; /* Horizontal centering */
+    align-items: center; /* Vertical centering */
+    z-index: 1000; /* Ensure it's above all other content */
+}
+
+.popup-content {
+    background: black; /* Solid background for the popup content */
+    padding: 20px; /* Add some padding for spacing */
+    border-radius: 8px; /* Optional: Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Optional: Shadow for depth */
+    text-align: center; /* Center the text inside */
+}
+
+.popup-content button {
+    margin: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}

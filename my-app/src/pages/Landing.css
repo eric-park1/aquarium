@@ -8,7 +8,7 @@
     flex: 1; /* Take up half the available width */
     /* overflow-y: auto;  */
     /* work on getting rid of the white background in the scrollable edges */
-    background-color: #1F1746; /* Optional background color */
+    background-color: #120d31 /* Optional background color */
 }
   
 .right-side {

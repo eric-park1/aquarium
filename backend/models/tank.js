@@ -47,6 +47,26 @@ async function logFocusTime(durationInMinutes, userID) {
   return user;
 }
 
+const getStartOfWeek = (date = new Date()) => {
+  const day = date.getDay(); 
+  const diff = date.getDate() - day 
+  const startOfWeek = new Date(date.setDate(diff));
+  startOfWeek.setHours(0, 0, 0, 0);
+  return startOfWeek;
+};
+
+const getStartOfMonth = (date = new Date()) => {
+  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  startOfMonth.setHours(0, 0, 0, 0); // Normalize to the beginning of the day
+  return startOfMonth;
+};
+
+const getStartOfYear = (date = new Date()) => {
+  const startOfYear = new Date(date.getFullYear(), 0, 1);
+  startOfYear.setHours(0, 0, 0, 0); // Normalize to the beginning of the day
+  return startOfYear;
+};
+
 tankSchema.statics.createSession =  async function createSession(email, duration, marineType, success) {
 
   const User = require("./userModel"); // Ensure this points to your User schema
@@ -63,12 +83,59 @@ tankSchema.statics.createSession =  async function createSession(email, duration
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
 
+  // create dayModel
+  const currentDay = await dayModel.findOneAndUpdate(
+    { user: user._id, createdAt: currentDate },
+    { $setOnInsert: { user: user._id, createdAt: currentDate, organism: [] }}
+  )
+
+  // create weekModel
+  const currentWeek = await weekModel.findOneAndUpdate(
+    { user: user._id, createdAt: getStartOfWeek(currentDate) },
+    { $setOnInsert: { user: user._id, createdAt: getStartOfWeek(currentDate), organism: [] }}
+  )
+
+  //create monthModel
+  const currentMonth = await monthModel.findOneAndUpdate(
+    { user: user._id, createdAt: getStartOfMonth(currentDate) },
+    { $setOnInsert: { user: user._id, createdAt: getStartOfMonth(currentDate), organism: [] }}
+  )
+
+  const currentYear = await yearModel.findOneAndUpdate(
+    { user: user._id, createdAt: getStartOfYear(currentDate) },
+    { $setOnInsert: { user: user._id, createdAt: getStartOfYear(currentDate), organism: [] }}
+  )
+
   // Find or create the user's tank for the current month and year
   const currentTank = await this.findOneAndUpdate(
     { user: user._id, month: currentMonth, year: currentYear },
     { $setOnInsert: { user: user._id, month: currentMonth, year: currentYear, organism: [] } },
     { new: true, upsert: true }
   );
+
+  if (!user.dayTank.includes(currentDay._id)) {
+    user.dayTank.push(currentDay._id);
+    user.markModified('aquarium'); // Ensure the aquarium field is marked as modified
+    await user.save();
+  }
+
+  if (!user.weekTank.includes(currentWeek._id)) {
+    user.weekTank.push(currentWeek._id);
+    user.markModified('aquarium'); // Ensure the aquarium field is marked as modified
+    await user.save();
+  }
+
+  if (!user.monthTank.includes(currentMonth._id)) {
+    user.monthTank.push(currentMonth._id);
+    user.markModified('aquarium'); // Ensure the aquarium field is marked as modified
+    await user.save();
+  }
+
+  if (!user.yearTank.includes(currentYear._id)) {
+    user.yearTank.push(currentYear._id);
+    user.markModified('aquarium'); // Ensure the aquarium field is marked as modified
+    await user.save();
+  }
 
   // Add the tank ID to the user's aquarium
   if (!user.aquarium.includes(currentTank._id)) {
@@ -86,6 +153,11 @@ tankSchema.statics.createSession =  async function createSession(email, duration
   });
 
   // Add the session ID to the tank’s organism array
+  currentDay.FocusEvents.push(session._id);
+  currentWeek.FocusEvents.push(session._id);
+  currentMonth.FocusEvents.push(session._id);
+  currentYear.FocusEvents.push(session._id);
+  
   currentTank.organism.push(session._id);
 
   // Increment total catches in the tank if the session is successful

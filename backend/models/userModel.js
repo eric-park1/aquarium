@@ -42,16 +42,31 @@ const userSchema = new Schema({
       default: 0,
     },
   },
-  fishCaught: {
-    type: Number, // Total number of fish caught
-    default: 0,
+  currency: {
+    type: Number,
+    default: 1000,
   },
-  aquarium: [
+  speciesOwned: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Tank', // Reference to the tank schema
-    },
+      type: String,
+    }
   ],
+  dayTank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'dayTank', // Reference to the day tank schema
+  },
+  weekTank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'weekTank', // Reference to the week tank schema
+  },
+  monthTank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'monthTank', // Reference to the month tank schema
+  },
+  yearTank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'yearTank', // Reference to the year tank schema
+  },
   achievements: [
     {
       type: mongoose.Schema.Types.ObjectId,

@@ -10,12 +10,14 @@ import Login from './pages/UserAuth/Login'
 import Signup from './pages/UserAuth/Signup'
 import ThreeScene from './pages/ThreeScene'
 import Tanks from './pages/Tanks'
+import Shop from './pages/shop'
 
 function App() {
   const { user } = useAuthContext()
 
   return (
     <div className="App">
+
       <BrowserRouter>
         <div className="pages">
         {/* <Navbar /> */}
@@ -42,7 +44,7 @@ function App() {
             />
             <Route 
               path="/shop" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+              element={user ? <Shop /> : <Navigate to="/login" />} 
             />
             <Route 
               path="/history" 
