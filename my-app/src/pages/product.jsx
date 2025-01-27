@@ -19,7 +19,7 @@ async function getUserCurrency() {
             return 0; // Return 0 currency if there is an error
         }
     }
-    return 0; // Default to 0 if user is not logged in
+    return 0; 
 }
 
 
@@ -39,7 +39,6 @@ const updateUserCurrency = async (balance, id, productName) => {
                 body: JSON.stringify({ email, currency: balance }),
             });
 
-            // Check if the response is OK, otherwise log raw response
             const textResponse = await response.text();
             if (!response.ok) {
                 console.error('Error updating currency:', textResponse);
@@ -53,7 +52,7 @@ const updateUserCurrency = async (balance, id, productName) => {
                 console.error('Error parsing response as JSON:', e);
                 return false;
             }
-            console.log(result.message); // Logs "Currency updated successfully"
+            console.log(result.message); 
 
             // Proceed to add species
             const speciesAdd = await fetch('/api/userActions/addSpecies', {
@@ -73,10 +72,10 @@ const updateUserCurrency = async (balance, id, productName) => {
             const speciesAddResult = await speciesAdd.json();
             console.log(speciesAddResult.message);
 
-            return true; // Indicate success
+            return true; // success
         } catch (error) {
             console.error('Error updating currency:', error);
-            return false; // Indicate failure
+            return false; // failure
         }
     }
 };
@@ -85,7 +84,7 @@ const Product = (props) => {
     const { id, productName, price, productImage } = props.data;
     const [userCoins, setUserCoins] = useState(null); // Start with null to indicate loading
     const [showPopup, setShowPopup] = useState(false);
-    const [popupType, setPopupType] = useState(""); // Tracks type of popup ("confirm" or "error")
+    const [popupType, setPopupType] = useState(""); 
 
     // Fetch user coins on mount
     useEffect(() => {

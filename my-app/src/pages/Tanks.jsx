@@ -1,4 +1,3 @@
-//import React, { useState, useRef, useEffect } from "react";
 import NavbarSide from "../components/SlidingPane";
 import BarChartComponent from "../components/ChartSession";
 
@@ -152,6 +151,7 @@ const sessionRecord = (daySessions, weekSessions, monthSessions, yearSessions) =
     },
     24 * 60
   );
+  
 
   // Month Array (variable days, max 24 hours per day)
   const currentMonth = new Date().getMonth();
@@ -185,210 +185,67 @@ const sessionRecord = (daySessions, weekSessions, monthSessions, yearSessions) =
 
 
 const Tanks = () => {
-  const [state, setState] = useState({
-    dayTank: null,
-    weekTank: null,
-    monthTank: null,
-    yearTank: null,
-    daySession: null,
-    weekSession: null,
-    monthSession: null,
-    yearSession: null,
-  });
+  const [state, setState] = useState({});
+  const [focusData, setFocusData] = useState({});
+  const [activeView, setActiveView] = useState("day");
 
-  const [focusTimeByDay, setFocusTimeByDay] = useState([]);
-  const [focusTimeByWeek, setFocusTimeByWeek] = useState([]);
-  const [focusTimeByMonth, setFocusTimeByMonth] = useState([]);
-  const [focusTimeByYear, setFocusTimeByYear] = useState([]);
-
-  const [activeComponent, setActiveComponent] = useState('day'); // Default active component
-
-  const rows = 8; 
-  const columns = 8;
-
-  const [n, setN] = useState(0); // Track number of fish to display based on selected view
-
-  // This useEffect fetches the data when the component mounts
   useEffect(() => {
-    let email = null;
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        email = parsedUser.email;
-        getAllSessions(email).then((data) => {
-          const { dayTank, weekTank, monthTank, yearTank, daySession, weekSession, monthSession, yearSession } = data;
-          setState({
-            dayTank,
-            weekTank,
-            monthTank,
-            yearTank,
-            daySession,
-            weekSession,
-            monthSession,
-            yearSession,
-          });
-
-          const { dayArray, weekArray, monthArray, yearArray } = sessionRecord(daySession, weekSession, monthSession, yearSession)
-
-          // Set focusTime arrays
-          setFocusTimeByDay(dayArray);
-          setFocusTimeByWeek(weekArray);
-          setFocusTimeByMonth(monthArray);
-          setFocusTimeByYear(yearArray);
-        }).catch(console.error);
-      } catch (error) {
-        console.error("Error parsing user data from localStorage", error);
-      }
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser?.email) {
+      getAllSessions(storedUser.email)
+        .then((data) => {
+          setState(data);
+          const { dayArray, weekArray, monthArray, yearArray } = sessionRecord(
+            data.daySession,
+            data.weekSession,
+            data.monthSession,
+            data.yearSession
+          );
+          setFocusData({ dayArray, weekArray, monthArray, yearArray });
+        })
+        .catch(console.error);
     }
   }, []);
 
-  // Update the value of `n` based on the active component (e.g., day, week, month, year)
-  useEffect(() => {
-    let sessionData = [];
-    
-    switch (activeComponent) {
-      case 'day':
-        sessionData = state.daySession;
-        break;
-      case 'week':
-        sessionData = state.weekSession;
-        break;
-      case 'month':
-        sessionData = state.monthSession;
-        break;
-      case 'year':
-        sessionData = state.yearSession;
-        break;
-      default:
-        break;
-    }
-    console.log(`Active Component: ${activeComponent}, Session Data:`, sessionData);
-    setN(sessionData ? sessionData.length : 0); // Update `n` based on session data
-  }, [activeComponent, state]);
-
-  // Render each square, with fish images depending on `n`
-  const renderSquare = (row, col) => {
-    const isBlack = (row + col) % 2 === 1;
-    const squareStyle = { 
-      backgroundColor: isBlack ? 'black' : 'white',
-      width: '50px',
-      height: '50px',
-      position: 'relative', // Enables positioning for the image
-    };
+  const renderChart = () => {
+    const labels = {
+      day: Array.from({ length: 24 }, (_, i) => `${i}:00`), // Hourly labels
+      week: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], // Weekly labels
+      month: focusData.monthArray?.map((_, i) => `Day ${i + 1}`), // Daily labels for the month
+      year: [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+      ], // Monthly labels
+    }[activeView] || [];
   
-    const imageStyle = {
-      width: '30px',
-      height: '30px',
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)', // Centers the image
-      pointerEvents: 'none', // Ensures the image doesn’t interfere with clicks
-    };
+    const chartData =
+      {
+        day: focusData.dayArray,
+        week: focusData.weekArray,
+        month: focusData.monthArray,
+        year: focusData.yearArray,
+      }[activeView] || [];
   
-    // Calculate the index of the current square in a flat array representation
-    const index = row * columns + col;
-  
-    // Render an image if the current index is less than n
-    return (
-      <div key={`${row}-${col}`} style={squareStyle}>
-        {index < n && (
-          <img 
-            src={fish}
-            alt={`square-${row}-${col}`} 
-            style={imageStyle} 
-          />
-        )}
-      </div>
-    );
-  };
-  
-  const renderRow = (row) => {
-    return (
-      <div key={row} style={{ display: 'flex' }}>
-        {Array.from(Array(columns), (_, col) => renderSquare(row, col))}
-      </div>
-    );
-  };
-
-  // ViewComponent renders the chart based on active view
-  const ViewComponent = ({ viewType }) => {
-    let chartContent;
-    switch (viewType) {
-      case 'day':
-        chartContent = state.daySession && n > 0 ? (
-          <BarChartComponent dataArray={focusTimeByDay} />
-        ) : (
-          <p>Loading day chart data...</p>
-        );
-        break;
-      case 'week':
-        chartContent = state.weekSession && n > 0 ? (
-          <BarChartComponent dataArray={focusTimeByWeek} />
-        ) : (
-          <p>Loading week chart data...</p>
-        );
-        break;
-      case 'month':
-        chartContent = state.monthSession && n > 0 ? (
-          <BarChartComponent dataArray={focusTimeByMonth} />
-        ) : (
-          <p>Loading month chart data...</p>
-        );
-        break;
-      case 'year':
-        chartContent = state.yearSession && n > 0 ? (
-          <BarChartComponent dataArray={focusTimeByYear} />
-        ) : (
-          <p>Loading year chart data...</p>
-        );
-        break;
-      default:
-        chartContent = <p>Select a valid view type.</p>;
-    }
-
-    return (
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* Main Content Area */}
-        <div style={{ flex: 1 }}>
-          {/* Display the appropriate chart content based on the viewType */}
-          {chartContent}
-        </div>
-      </div>
-    );
+    return <BarChartComponent dataArray={chartData} labels={labels} />;
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      {/* Navbar */}
-      <div style={{ flexShrink: 0 }}>
-        <NavbarSide />
+    <div className="tanks-container">
+      <NavbarSide />
+      <div className="button-bar">
+        {["day", "week", "month", "year"].map((view) => (
+          <button
+            key={view}
+            className={`view-button ${activeView === view ? "active" : ""}`}
+            onClick={() => setActiveView(view)}
+          >
+            {view.charAt(0).toUpperCase() + view.slice(1)} View
+          </button>
+        ))}
       </div>
-
-      <div className="button-bar" style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
-        <button onClick={() => setActiveComponent('day')}>Day View</button>
-        <button onClick={() => setActiveComponent('week')}>Week View</button>
-        <button onClick={() => setActiveComponent('month')}>Month View</button>
-        <button onClick={() => setActiveComponent('year')}>Year View</button>
-      </div>
-  
-      {/* Main Content Area */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* Top Half: Array */}
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          {state.daySession || state.weekSession || state.monthSession || state.yearSession
-            ? Array.from(Array(rows), (_, row) => renderRow(row))
-            : <p>Loading tank data...</p>}
-        </div>
-  
-        {/* Bottom Half: Chart */}
-        <div style={{ flex: 1 }}>
-          <ViewComponent viewType={activeComponent} />
-        </div>
-      </div>
+      <div className="chart-container">{renderChart()}</div>
     </div>
-  );  
+  );
 };
 
 export default Tanks;

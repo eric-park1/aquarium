@@ -2,7 +2,6 @@
 import { useState } from "react"
 import { useSignup } from "../../hooks/useSignup"
 import { useNavigate } from 'react-router-dom';
-//const navigate = useNavigate()
 
 const Signup = () => {
   const [email, setEmail] = useState('')
@@ -13,10 +12,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // await signup(email, password)
-
     try {
-        // Replace with your actual login request code
         const success = await signup(email, password); // If successful, returns true or user data
   
         if (success) {

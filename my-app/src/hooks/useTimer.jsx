@@ -54,7 +54,7 @@ export const useTimer = () => {
       }
   
       console.log("Session created successfully. Adjusting currency...");
-      duration = Number(duration); // Ensure numeric comparison
+      duration = Number(duration); 
       console.log("Numeric duration:", duration);
   
       if (duration >= 2) {

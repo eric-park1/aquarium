@@ -71,17 +71,7 @@ const LoginSignup = () => {
         onSubmit={action === "Login" ? handleLogin : handleSignup}
         className="log-sign-inputs"
       >
-        {action === "Sign Up" && (
-          <div className="input">
-            <img src={user_icon} alt="" />
-            <input
-              type="text"
-              placeholder="Name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-        )}
+       
         <div className="input">
           <img src={user_email} alt="" />
           <input
@@ -112,11 +102,7 @@ const LoginSignup = () => {
         </button>
       </form>
 
-      {action === "Login" && (
-        <div className="forgot-password">
-          Forgot your password? <span>Click Here</span>
-        </div>
-      )}
+      
     </div>
   );
 };

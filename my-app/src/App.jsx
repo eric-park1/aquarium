@@ -1,16 +1,17 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuthContext } from './hooks/useAuthContext'
-import "./styles/App.css"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuthContext } from "./hooks/useAuthContext";
+import "./styles/App.css";
 
-
+import React from "react";
 // pages & components
-import CountdownTimer from './pages/Home'
-import Landing from './pages/Landing'
-import Login from './pages/UserAuth/Login'
-import Signup from './pages/UserAuth/Signup'
-import ThreeScene from './pages/ThreeScene'
-import Tanks from './pages/Tanks'
-import Shop from './pages/shop'
+
+import TanksFishies from "./pages/History";
+import CountdownTimer from "./pages/Home";
+import Landing from "./pages/Landing";
+import Tanks from "./pages/Tanks";
+import Shop from "./pages/shop";
+
+
 
 function App() {
   const { user } = useAuthContext()
@@ -32,12 +33,9 @@ function App() {
             />
             <Route 
               path="/about" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
+              element={user ? <TanksFishies /> : <Navigate to="/login" />} 
             />
-            <Route 
-              path="/leadership" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
-            />
+            
             <Route 
               path="/tanks" 
               element={user ? <Tanks /> : <Navigate to="/login" />} 
@@ -46,23 +44,6 @@ function App() {
               path="/shop" 
               element={user ? <Shop /> : <Navigate to="/login" />} 
             />
-            <Route 
-              path="/history" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/calendar" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/task" 
-              element={user ? <ThreeScene /> : <Navigate to="/login" />} 
-            />
-
-            {/* <Route 
-              path="/signup" 
-              element={!user ? <Signup /> : <Navigate to="/" />} 
-            /> */}
           </Routes>
         </div>
       </BrowserRouter>

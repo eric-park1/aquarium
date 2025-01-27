@@ -1,17 +1,25 @@
-.page-container {
-    display: flex;
-    height: 100vh; /* Full height of the viewport */
-    width: 100vw; /* Full width of the viewport */
+.landing-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh; /* Full height of the viewport */
+  margin: 0;
 }
-  
+
+.left-side, .right-side {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
 .left-side {
-    flex: 1; /* Take up half the available width */
-    /* overflow-y: auto;  */
-    /* work on getting rid of the white background in the scrollable edges */
-    background-color: #120d31 /* Optional background color */
+  background-color: #111944; 
+  color: #333;
 }
-  
+
 .right-side {
-    flex: 1; /* Also takes half the available width */
-    background-color: #ffffff; /* Optional background color */
+  background-color: #ffffff; 
+  color: #000; 
 }

@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@react-three/drei": "^9.120.8",
+    "@react-three/fiber": "^8.17.12",
+    "@syncfusion/ej2-react-splitbuttons": "^28.1.37",
+    "three": "^0.172.0",
+    "three-mesh-bvh": "^0.8.0",
+    "three-stdlib": "^2.35.7"
+  }
+}

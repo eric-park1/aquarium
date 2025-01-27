@@ -43,13 +43,14 @@ const NavbarSide = () => {
                             <div>
                                 {/* <span>{user.email}</span> */}
                                 <button style={buttonStyle} onClick={handleLogout}>Log out</button>
-                                <button style={buttonStyle} onClick={() => handleNavigation('/about')}>About</button>
-                                <button style={buttonStyle} onClick={() => handleNavigation('/leadership')}>Leadership</button>
-                                <button style={buttonStyle} onClick={() => handleNavigation('/tanks')}>Your Tanks</button>
+                                <button style={buttonStyle} onClick={() => handleNavigation('/')}>Home</button>
+                                <button style={buttonStyle} onClick={() => handleNavigation('/about')}>Your Tanks</button>
+                                {/* <button style={buttonStyle} onClick={() => handleNavigation('/leadership')}>Leadership</button> */}
+                                <button style={buttonStyle} onClick={() => handleNavigation('/tanks')}>History</button>
                                 <button style={buttonStyle} onClick={() => handleNavigation('/shop')}>Shop</button>
-                                <button style={buttonStyle} onClick={() => handleNavigation('/history')}>History</button>
-                                <button style={buttonStyle} onClick={() => handleNavigation('/calendar')}>Calendar</button>
-                                <button style={buttonStyle} onClick={() => handleNavigation('/task')}>Task</button>
+                                {/* <button style={buttonStyle} onClick={() => handleNavigation('/history')}>History</button> */}
+                                {/* <button style={buttonStyle} onClick={() => handleNavigation('/calendar')}>Calendar</button> */}
+                                {/* <button style={buttonStyle} onClick={() => handleNavigation('/task')}>Task</button> */}
                             </div>
                         )}
                         {!user && (

@@ -1,6 +1,6 @@
 /* Root element styling */
 #root {
-  /* Removed max-width and auto margin for full-width layout */
+  
   /* padding: 2rem; */
   text-align: center;
 }
@@ -34,10 +34,39 @@
   }
 }
 
-/* Card component styling */
-/* .card {
-  padding: 2em;
-} */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  /* overflow: hidden; */
+  flex-direction: column;
+}
+
+.App {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.c-container {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  /* position: absolute; */
+}
+
+.control-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 5px;
+}
+
 
 .read-the-docs {
   color: #888;

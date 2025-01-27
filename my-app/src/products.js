@@ -9,13 +9,13 @@ export const PRODUCTS = [
     },
     {
         id: 2,
-        productName: "Coral",
+        productName: "Coral1",
         price: 800,
         productImage: fish
     },
     {
         id: 3,
-        productName: "Shark",
+        productName: "Coral2",
         price: 800,
         productImage: fish
     },
@@ -27,7 +27,7 @@ export const PRODUCTS = [
     },
     {
         id: 5,
-        productName: "Dolphin",
+        productName: "Coral3",
         price: 800,
         productImage: fish
     },

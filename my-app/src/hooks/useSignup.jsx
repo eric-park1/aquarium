@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useAuthContext } from './useAuthContext'
-//const navigate = useNavigate();
 
 
 const useSignup = () => {
@@ -32,7 +31,6 @@ const useSignup = () => {
 
       // update loading state
       setIsLoading(false )
-      //navigate('/')
       return true
     }
   }

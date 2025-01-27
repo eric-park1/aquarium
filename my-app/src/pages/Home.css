@@ -1,5 +1,153 @@
 .page-container {
     display: flex;
-    height: 100vh; /* Full height of the viewport */
-    width: 100vw; /* Full width of the viewport */
-}
+    flex-direction: column;
+    align-items: center; 
+    justify-content: flex-start; 
+    height: 100vh;
+    width: 100vw; 
+    padding: 0px;
+    box-sizing: border-box; 
+    position:relative;
+  }
+
+  .popup-container {
+    position: absolute;
+    /* width: 60%; */
+    top: 50%; 
+    left: 50%;
+    z-index: 10; 
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .timer-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    padding: 20px;
+    background: #120d31;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px; 
+    z-index: 2;
+  }
+  
+  
+  .timer-container label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .timer-container h2 {
+    margin: 20px 0;
+  }
+  
+  .duration-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: center;
+  }
+  
+  .duration-option {
+    padding: 10px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .duration-option:hover {
+    background: #0056b3;
+  }
+  
+  .popup-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .start-btn {
+    padding: 10px 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .stop-btn {
+    padding: 10px 20px;
+    background: #b41717;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .start-btn:hover {
+    background: #218838;
+  }
+  
+  .cancel-btn {
+    padding: 10px 20px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cancel-btn:hover {
+    background: #c32232;
+  }
+
+  .timer-button {
+    cursor: pointer;
+    font-size: 5em;
+    color: #ffffff;
+  }
+  
+
+  .canvas-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 75%;
+    height: 70%;
+    z-index: 1; /* Lower z-index to prevent overlap */
+  }
+
+  .marine-type-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .marine-type-container label {
+    font-size: 1rem;
+    color: #ffffff;
+  }
+  
+  .marine-type-container input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .marine-type-btn {
+    color: #ffffff;
+  }
+  
+  
+  
